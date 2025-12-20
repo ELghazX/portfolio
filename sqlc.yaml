@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  # change engine to database you are using
+  - engine: "postgresql"
+    queries: "internal/database/queries"
+    schema: "internal/database/migrations"
+    gen:
+      go:
+        package: "generated"
+        out: "internal/database/generated"
