@@ -1,9 +1,12 @@
 package pages
 
-import "github.com/elghazx/portfolio/internal/components"
+import (
+	"github.com/elghazx/portfolio/internal/components"
+	"github.com/elghazx/portfolio/internal/components/icons"
+)
 
 templ NotFound() {
-	@components.Base("404 Not Found - ghazali@portfolio", "") {
+	@components.Base("404") {
 		<div class="max-w-4xl mx-auto text-center">
 			<div class="mb-10">
 				<div class="text-sm text-gray-500 mb-3">$ ~/404</div>
@@ -18,19 +21,22 @@ templ NotFound() {
 				<div class="text-gray-300 mb-1">drwxr-xr-x home/</div>
 				<div class="text-gray-300 mb-1">drwxr-xr-x projects/</div>
 				<div class="text-gray-300 mb-1">drwxr-xr-x experience/</div>
-				<!-- <div class="text-gray-300 mb-3">drwxr-xr-x  posts/</div> -->
+				<div class="text-gray-300 mb-3">drwxr-xr-x posts/</div>
 				<div class="text-cyan-400">$ cd home</div>
 			</div>
-			<div class="flex flex-col sm:flex-row gap-4 justify-center">
-				<a href="/" class="px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors">
-					← Go Home
-				</a>
-				<a
-					href="/projects"
-					class="px-6 py-3 bg-gray-100 text-gray-900 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-				>
-					View Projects
-				</a>
+			<div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
+				@components.Button(
+					"/projects",
+					"View Projects",
+					components.ButtonPrimary,
+					nil,
+				)
+				@components.Button(
+					"/",
+					"Go Home",
+					components.ButtonSecondary,
+					icons.ArrowLeft(),
+				)
 			</div>
 		</div>
 	}

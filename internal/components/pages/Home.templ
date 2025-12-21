@@ -1,21 +1,17 @@
 package pages
 
-import (
-	"github.com/elghazx/portfolio/internal/components"
-)
+import "github.com/elghazx/portfolio/internal/components"
 
 templ Home(projects []components.Project) {
-	@components.Base("ghazali@portfolio", "home") {
+	@components.Base("home") {
+		<div class="text-sm text-gray-500 mb-3">$ ~/</div>
 		@components.Terminal()
 		<section>
 			<div class="flex items-center justify-between mb-4 sm:mb-6">
 				<h2 class="text-2xl sm:text-3xl font-bold text-gray-900">LATEST UPDATES</h2>
-				<button hx-get="/api/refresh-projects" hx-target="#project-grid" class="text-xs text-blue-600">Refresh</button>
 			</div>
-			<div id="project-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-				for _, project := range projects {
-					@components.ProjectCard(project)
-				}
+			<div class="mt-4 md:mt-6">
+				@components.ProjectsList(projects)
 			</div>
 		</section>
 	}
