@@ -1,6 +1,9 @@
 package server
 
 import (
+	"strings"
+	"time"
+
 	"github.com/elghazx/portfolio/internal/components"
 	"github.com/elghazx/portfolio/internal/components/pages"
 	"github.com/labstack/echo/v4"
@@ -71,7 +74,23 @@ func projectsHandler(c echo.Context) error {
 		},
 	}
 
-	return Render(c, pages.Projects(projects))
+	search := strings.ToLower(c.QueryParam("search"))
+	status := c.QueryParam("status")
+
+	var filteredProjects []components.Project
+	for _, project := range projects {
+		matchSearch := search == "" ||
+			strings.Contains(strings.ToLower(project.Title), search) ||
+			strings.Contains(strings.ToLower(project.Description), search)
+
+		matchStatus := status == "" || project.Status == status
+
+		if matchSearch && matchStatus {
+			filteredProjects = append(filteredProjects, project)
+		}
+	}
+
+	return Render(c, pages.Projects(filteredProjects))
 }
 
 func experienceHandler(c echo.Context) error {
@@ -107,4 +126,82 @@ func experienceHandler(c echo.Context) error {
 
 func notFoundHandler(c echo.Context) error {
 	return Render(c, pages.NotFound())
+}
+
+func postsHandler(c echo.Context) error {
+	allPosts := []components.Post{
+		{
+			ID:        1,
+			Title:     "Getting Started with Go and HTMX",
+			Slug:      "getting-started-go-htmx",
+			Summary:   "Learn how to build modern web applications using Go backend with HTMX for dynamic frontend interactions without complex JavaScript frameworks.",
+			Content:   "Full content here...",
+			Tags:      []string{"Go", "HTMX", "Web Development"},
+			CreatedAt: time.Date(2023, 12, 15, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			ID:        2,
+			Title:     "Linux System Administration Tips",
+			Slug:      "linux-system-administration-tips",
+			Summary:   "Essential Linux commands and system administration techniques for managing servers and development environments effectively.",
+			Content:   "Full content here...",
+			Tags:      []string{"Linux & Open Source", "System Administration"},
+			CreatedAt: time.Date(2023, 12, 10, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			ID:        3,
+			Title:     "Building RESTful APIs with Echo Framework",
+			Slug:      "building-restful-apis-echo-framework",
+			Summary:   "Complete guide to creating robust REST APIs using Echo framework in Go, including middleware, validation, and error handling.",
+			Content:   "Full content here...",
+			Tags:      []string{"Go", "API Development", "Backend"},
+			CreatedAt: time.Date(2023, 12, 5, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			ID:        4,
+			Title:     "Docker Container Optimization",
+			Slug:      "docker-container-optimization",
+			Summary:   "Best practices for optimizing Docker containers, reducing image size, and improving build performance for production deployments.",
+			Content:   "Full content here...",
+			Tags:      []string{"Docker", "DevOps", "Optimization"},
+			CreatedAt: time.Date(2023, 11, 28, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			ID:        5,
+			Title:     "Gaming Setup for Developers",
+			Slug:      "gaming-setup-developers",
+			Summary:   "How to balance a productive development environment with a gaming setup, including hardware recommendations and workspace organization.",
+			Content:   "Full content here...",
+			Tags:      []string{"Gaming", "Hardware & Setup", "Productivity"},
+			CreatedAt: time.Date(2023, 11, 20, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			ID:        6,
+			Title:     "Network Security Fundamentals",
+			Slug:      "network-security-fundamentals",
+			Summary:   "Understanding basic network security concepts, common vulnerabilities, and essential tools for protecting your infrastructure.",
+			Content:   "Full content here...",
+			Tags:      []string{"Networking & IT", "Security", "Infrastructure"},
+			CreatedAt: time.Date(2023, 11, 15, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	search := strings.ToLower(c.QueryParam("search"))
+
+	var filteredPosts []components.Post
+	for _, post := range allPosts {
+		matchSearch := search == "" ||
+			strings.Contains(strings.ToLower(post.Title), search) ||
+			strings.Contains(strings.ToLower(post.Summary), search)
+
+		if matchSearch {
+			filteredPosts = append(filteredPosts, post)
+		}
+	}
+
+	if c.Request().Header.Get("HX-Request") == "true" {
+		return Render(c, pages.PostsList(filteredPosts))
+	}
+
+	return Render(c, pages.Posts(filteredPosts))
 }

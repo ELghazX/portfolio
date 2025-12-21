@@ -18,6 +18,7 @@ func RegisterRoutes(e *echo.Echo) {
 	e.GET("/", homeHandler)
 	e.GET("/projects", projectsHandler)
 	e.GET("/experience", experienceHandler)
+	e.GET("/posts", postsHandler)
 	
 	// 404 handler
 	e.RouteNotFound("/*", notFoundHandler)
