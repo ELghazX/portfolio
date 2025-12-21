@@ -1,0 +1,119 @@
+package components
+
+templ Terminal() {
+	<section class="mb-8 sm:mb-12" x-data="terminalLogic()">
+		<div class="flex items-center justify-between mb-4 sm:mb-6">
+			<h2 class="text-2xl sm:text-3xl font-bold text-gray-900">TERMINAL ACCESS</h2>
+			<span class="text-sm text-gray-500">~/</span>
+		</div>
+		<div class="bg-gray-900 rounded-lg overflow-hidden shadow-lg">
+			<div class="bg-gray-800 px-4 py-2 flex items-center gap-2">
+				<div class="flex gap-2">
+					<div class="w-3 h-3 bg-red-500 rounded-full"></div>
+					<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+					<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+				</div>
+				<span class="text-gray-400 text-xs ml-2">fish</span>
+			</div>
+			<div
+				class="p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[250px] max-h-[400px] overflow-y-auto"
+				x-ref="terminalBody"
+			>
+				<template x-for="line in output">
+					<div
+						:class="{
+                            'text-blue-400': line.type === 'info',
+                            'text-green-400': line.type === 'success',
+                            'text-cyan-400': line.type === 'prompt',
+                            'text-red-400': line.type === 'error',
+                            'text-gray-300': line.type === 'default'
+                        }"
+						x-text="line.text"
+					></div>
+				</template>
+				<div class="flex items-center mt-2">
+					<span class="text-cyan-400 mr-2">~ ❯</span>
+					<input
+						x-model="currentInput"
+						@keyup.enter="executeCommand()"
+						@keyup.up="historyUp()"
+						@keyup.down="historyDown()"
+						type="text"
+						class="flex-1 bg-transparent text-white outline-none"
+						autofocus
+						autocomplete="off"
+					/>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script html>
+  function terminalLogic() {
+    return {
+      currentInput: '',
+      history: [],
+      historyIndex: -1,
+      output: [
+        {text: 'System check... OK', type: 'success'},
+        {text: "Welcome to Ghazali's Portfolio.", type: 'default'},
+        {text: "Try 'help' for available commands", type: 'default'}
+      ],
+      executeCommand() {
+        let cmd = this.currentInput.trim();
+        if (!cmd) return;
+
+        this.history.unshift(cmd);
+        this.historyIndex = -1;
+        this.output.push({text: `~ ❯ ${cmd}`, type: 'prompt'});
+
+        let cmdLower = cmd.toLowerCase();
+
+        if (cmdLower === 'clear') {
+          this.output = [];
+        } else if (cmdLower === 'help') {
+          this.output.push({text: 'Available commands:', type: 'info'});
+          this.output.push({text: 'clear     - Clear terminal', type: 'default'});
+          this.output.push({text: 'ls        - List directories', type: 'default'});
+          this.output.push({text: 'whoami    - About me', type: 'default'});
+          this.output.push({text: 'contact   - Contact info', type: 'default'});
+          this.output.push({text: 'cd        - Change directory', type: 'default'});
+        } else if (cmdLower === 'ls') {
+          this.output.push({text: 'home/  about/  projects/  posts/', type: 'info'});
+        } else if (cmdLower === 'whoami') {
+          this.output.push({text: "I’m Ghazali, a Backend Developer focused on speed and simplicity.", type: 'default'});
+        } else if (cmdLower.startsWith('cd ')) {
+          let dir = cmd.slice(3).trim();
+          if (['projects', 'about', 'posts'].includes(dir)) {
+            this.output.push({text: `Navigating to /${dir}...`, type: 'success'});
+            setTimeout(() => window.location.href = `/${dir}`, 500);
+          } else {
+            this.output.push({text: `cd: ${dir}: No such directory`, type: 'error'});
+          }
+        } else {
+          this.output.push({text: `Command not found: ${cmd}`, type: 'error'});
+        }
+
+        this.currentInput = '';
+        this.$nextTick(() => {
+          this.$refs.terminalBody.scrollTop = this.$refs.terminalBody.scrollHeight;
+        });
+      },
+      historyUp() {
+        if (this.historyIndex < this.history.length - 1) {
+          this.historyIndex++;
+          this.currentInput = this.history[this.historyIndex];
+        }
+      },
+      historyDown() {
+        if (this.historyIndex > 0) {
+          this.historyIndex--;
+          this.currentInput = this.history[this.historyIndex];
+        } else {
+          this.historyIndex = -1;
+          this.currentInput = '';
+        }
+      }
+    }
+  }
+</script>
+}
