@@ -4,7 +4,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/elghazx/goth-echo-setup/internal/database/generated"
+	"github.com/elghazx/portfolio/internal/database/generated"
 	// _ "github.com/lib/pq"
 )
 
