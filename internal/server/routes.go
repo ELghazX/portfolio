@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/elghazx/goth-echo-setup/internal"
+	"github.com/elghazx/portfolio/internal"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,5 +15,10 @@ func RegisterRoutes(e *echo.Echo) {
 
 	e.GET("/static/*", echo.WrapHandler(http.FileServer(http.FS(internal.StaticFiles))))
 
-	e.GET("/", root)
+	e.GET("/", homeHandler)
+	e.GET("/projects", projectsHandler)
+	e.GET("/experience", experienceHandler)
+	
+	// 404 handler
+	e.RouteNotFound("/*", notFoundHandler)
 }

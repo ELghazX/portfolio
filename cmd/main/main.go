@@ -5,7 +5,7 @@ import (
 	"os"
 
 	// "github.com/elghazx/goth-echo-setup/internal/database"
-	"github.com/elghazx/goth-echo-setup/internal/server"
+	"github.com/elghazx/portfolio/internal/server"
 
 	_ "github.com/joho/godotenv/autoload"
 )
