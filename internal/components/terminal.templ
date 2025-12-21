@@ -4,7 +4,6 @@ templ Terminal() {
 	<section class="mb-8 sm:mb-12" x-data="terminalLogic()">
 		<div class="flex items-center justify-between mb-4 sm:mb-6">
 			<h2 class="text-2xl sm:text-3xl font-bold text-gray-900">TERMINAL ACCESS</h2>
-			<span class="text-sm text-gray-500">~/</span>
 		</div>
 		<div class="bg-gray-900 rounded-lg overflow-hidden shadow-lg">
 			<div class="bg-gray-800 px-4 py-2 flex items-center gap-2">
@@ -13,7 +12,7 @@ templ Terminal() {
 					<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
 					<div class="w-3 h-3 bg-green-500 rounded-full"></div>
 				</div>
-				<span class="text-gray-400 text-xs ml-2">fish</span>
+				<span class="text-gray-400 text-xs ml-2">elghaz.my.id</span>
 			</div>
 			<div
 				class="p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[250px] max-h-[400px] overflow-y-auto"
@@ -56,64 +55,99 @@ templ Terminal() {
       output: [
         {text: 'System check... OK', type: 'success'},
         {text: "Welcome to Ghazali's Portfolio.", type: 'default'},
-        {text: "Try 'help' for available commands", type: 'default'}
+        {text: "~ ❯ whoami", type: 'prompt'},
+        {text: "Informatics student & Backend Developer specializing in Go.", type: 'default'},
+        {text: "Experienced in Linux and Proxmox homelab environments.", type: 'default'},
+        {text: "Passionate about scalable infrastructure.", type: 'default'},
+        {text: "Try 'help' for available commands", type: 'info'}
       ],
+
+      commands: {
+        help: () => [
+          {text: 'Available commands:', type: 'info'},
+          {text: 'clear     - Clear terminal', type: 'default'},
+          {text: 'ls        - List directories', type: 'default'},
+          {text: 'whoami    - About me', type: 'default'},
+          {text: 'contact   - Contact info', type: 'default'},
+          {text: 'cd        - Change directory', type: 'default'}
+        ],
+        ls: () => [{text: 'home/  experience/  projects/  posts/', type: 'info'}],
+        whoami: () => [
+          {text: "I’m Ghazali, Informatics student with a strong interest in backend development using Go (Golang).", type: 'default'},
+          {text: "Experienced in Linux Environment, running a personal homelab with Proxmox, and building lighweight web applications using Go.", type: 'default'},
+          {text: "Passionate about backend systems, infrastructure, and continuous learning.", type: 'default'}
+        ],
+        contact: () => [
+          {text: "Email: ghazali.classroom@gmail.com", type: 'default'},
+          {text: "GitHub: github.com/elghazx", type: 'default'}
+        ],
+        clear: function () {this.output = []; return null;}
+      },
+
       executeCommand() {
-        let cmd = this.currentInput.trim();
-        if (!cmd) return;
+        const input = this.currentInput.trim();
+        if (!input) return;
 
-        this.history.unshift(cmd);
+        this.history.unshift(input);
         this.historyIndex = -1;
-        this.output.push({text: `~ ❯ ${cmd}`, type: 'prompt'});
+        this.output.push({text: `~ ❯ ${input}`, type: 'prompt'});
 
-        let cmdLower = cmd.toLowerCase();
+        const parts = input.toLowerCase().split(' ');
+        const cmd = parts[0];
+        const arg = parts[1];
 
-        if (cmdLower === 'clear') {
-          this.output = [];
-        } else if (cmdLower === 'help') {
-          this.output.push({text: 'Available commands:', type: 'info'});
-          this.output.push({text: 'clear     - Clear terminal', type: 'default'});
-          this.output.push({text: 'ls        - List directories', type: 'default'});
-          this.output.push({text: 'whoami    - About me', type: 'default'});
-          this.output.push({text: 'contact   - Contact info', type: 'default'});
-          this.output.push({text: 'cd        - Change directory', type: 'default'});
-        } else if (cmdLower === 'ls') {
-          this.output.push({text: 'home/  about/  projects/  posts/', type: 'info'});
-        } else if (cmdLower === 'whoami') {
-          this.output.push({text: "I’m Ghazali, a Backend Developer focused on speed and simplicity.", type: 'default'});
-        } else if (cmdLower.startsWith('cd ')) {
-          let dir = cmd.slice(3).trim();
-          if (['projects', 'about', 'posts'].includes(dir)) {
-            this.output.push({text: `Navigating to /${dir}...`, type: 'success'});
-            setTimeout(() => window.location.href = `/${dir}`, 500);
-          } else {
-            this.output.push({text: `cd: ${dir}: No such directory`, type: 'error'});
-          }
-        } else {
+        if (this.commands[cmd]) {
+          const result = this.commands[cmd].bind(this)();
+          if (result) this.output.push(...result);
+        }
+        else if (cmd === 'cd') {
+          this.handleCd(arg);
+        }
+        else {
           this.output.push({text: `Command not found: ${cmd}`, type: 'error'});
         }
 
         this.currentInput = '';
-        this.$nextTick(() => {
-          this.$refs.terminalBody.scrollTop = this.$refs.terminalBody.scrollHeight;
-        });
+        this.scrollToBottom();
       },
-      historyUp() {
-        if (this.historyIndex < this.history.length - 1) {
-          this.historyIndex++;
-          this.currentInput = this.history[this.historyIndex];
+
+      handleCd(dir) {
+        const validDirs = ['home', 'projects', 'experience', 'posts'];
+        if (!dir) {
+          this.output.push({text: `cd: missing operand`, type: 'error'});
+          return;
+        }
+        if (validDirs.includes(dir)) {
+          const path = dir === 'home' ? '' : dir;
+          this.output.push({text: `Navigating to /${path}...`, type: 'success'});
+          setTimeout(() => window.location.href = `/${path}`, 500);
+        } else {
+          this.output.push({text: `cd: ${dir}: No such directory`, type: 'error'});
         }
       },
+
+      scrollToBottom() {
+        this.$nextTick(() => {
+          if (this.$refs.terminalBody) {
+            this.$refs.terminalBody.scrollTop = this.$refs.terminalBody.scrollHeight;
+          }
+        });
+      },
+
+      historyUp() {
+        if (this.historyIndex < this.history.length - 1) {
+          this.currentInput = this.history[++this.historyIndex];
+        }
+      },
+
       historyDown() {
         if (this.historyIndex > 0) {
-          this.historyIndex--;
-          this.currentInput = this.history[this.historyIndex];
+          this.currentInput = this.history[--this.historyIndex];
         } else {
           this.historyIndex = -1;
           this.currentInput = '';
         }
       }
     }
-  }
-</script>
+  }</script>
 }

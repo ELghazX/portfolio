@@ -1,36 +1,26 @@
 package components
 
-templ Base(title string, activeMenu string) {
+import (
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
+
+templ Base(activeMenu string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>{ title }</title>
+			if activeMenu == "404" {
+				<title>404 Not Found - ghazali@portfolio</title>
+			} else {
+				<title>{ cases.Title(language.English).String(activeMenu) } - ghazali@portfolio</title>
+			}
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-			<style>
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-  </style>
 		</head>
-		<body class="bg-gray-50 font-sans antialiased">
+		<body class="bg-gray-50 font-mono antialiased">
 			<div x-data="{ mobileMenuOpen: false }" class="min-h-screen">
 				<header class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
 					<h1 class="font-semibold text-gray-900">ghazali@portfolio</h1>
@@ -40,10 +30,8 @@ templ Base(title string, activeMenu string) {
 						</svg>
 					</button>
 				</header>
-				
-				<!-- Backdrop -->
-				<div 
-					x-show="mobileMenuOpen" 
+				<div
+					x-show="mobileMenuOpen"
 					@click="mobileMenuOpen = false"
 					class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
 					x-transition:enter="transition-opacity ease-linear duration-300"
@@ -53,7 +41,6 @@ templ Base(title string, activeMenu string) {
 					x-transition:leave-start="opacity-100"
 					x-transition:leave-end="opacity-0"
 				></div>
-				
 				@Sidebar(activeMenu)
 				<main class="md:ml-64 min-h-screen">
 					<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">

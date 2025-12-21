@@ -1,0 +1,28 @@
+package components
+
+type ButtonVariant string
+
+const (
+	ButtonPrimary   ButtonVariant = "primary"
+	ButtonSecondary ButtonVariant = "secondary"
+)
+
+templ Button(href string, text string, variant ButtonVariant, icon templ.Component) {
+	{{
+		baseClasses := `inline-flex items-center justify-center gap-2 px-6 py-3
+font-medium rounded-lg transition-all group w-full
+sm:w-auto text-sm`
+		var variantClasses string
+		if variant == ButtonPrimary {
+			variantClasses = "bg-gray-900 text-white hover:bg-gray-800"
+		} else {
+			variantClasses = "bg-gray-100 text-gray-900 hover:bg-gray-200"
+		}
+	}}
+	<a href={ templ.SafeURL(href) } class={ baseClasses + " " + variantClasses }>
+		if icon != nil {
+			@icon
+		}
+		<span>{ text }</span>
+	</a>
+}
