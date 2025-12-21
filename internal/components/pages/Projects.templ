@@ -1,0 +1,31 @@
+package pages
+
+import (
+	"github.com/elghazx/portfolio/internal/components"
+)
+
+templ Projects(projects []components.Project) {
+	@components.Base("Projects - ghazali@portfolio", "projects") {
+		<div class="mb-8">
+			<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Projects</h1>
+			<p class="text-gray-600 text-lg">A collection of my work and experiments</p>
+		</div>
+		
+		<div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+			<div class="flex gap-2 flex-wrap">
+				<button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium">All</button>
+				<button class="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium">Completed</button>
+				<button class="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium">In Progress</button>
+			</div>
+			<div class="text-sm text-gray-500">
+				{ string(rune(len(projects))) } projects
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			for _, project := range projects {
+				@components.ProjectCard(project)
+			}
+		</div>
+	}
+}
