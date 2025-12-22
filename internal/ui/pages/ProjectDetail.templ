@@ -21,8 +21,8 @@ templ ProjectDetail(project models.Project) {
 			</div>
 			
 			if project.ImageUrl != "" {
-				<div class="mb-8">
-					<img src={ project.ImageUrl } alt={ project.Title } class="w-full h-64 object-cover rounded-lg"/>
+				<div class="mb-8 aspect-video overflow-hidden rounded-lg border border-gray-200 shadow-md">
+					<img src={ project.ImageUrl } alt={ project.Title } class="w-full h-full object-cover"/>
 				</div>
 			}
 			

@@ -13,6 +13,8 @@ var Projects = []models.Project{
 		Slug:    "portfolio-web",
 		Summary: "A web portfolio built with Go, HTMX, and Tailwind CSS. Server-side rendering with dynamic interactions.",
 		Content: `
+### Overview
+A web portfolio built with Go, HTMX, and Tailwind CSS. Server-side rendering with dynamic interactions.
 ### stack
 - go with echo framework
 - htmx for interactivity
@@ -46,6 +48,8 @@ the project demonstrates modern web development using traditional server-side te
 		Slug:    "go-vault",
 		Summary: "A secure file storage web app built with Go. Features JWT authentication, file upload/preview, and clean UI with Templ + HTMX.",
 		Content: `
+### Overview
+A secure file storage web app built with Go. Features JWT authentication, file upload/preview, and clean UI with Templ + HTMX.
 
 ### What it does
 Go-Vault lets users securely upload and manage files through a web interface. Built with Go and Echo framework.
@@ -76,6 +80,8 @@ Go-Vault lets users securely upload and manage files through a web interface. Bu
 		Slug:    "go-shorturl",
 		Summary: "A URL shortener (not really cause my domain takin some space) built with Go, PostgreSQL, and Redis. Features real-time click tracking and clean Swiss design interface.",
 		Content: `
+### Overview
+A URL shortener (not really cause my domain takin some space) built with Go, PostgreSQL, and Redis. Features real-time click tracking and clean Swiss design interface.
 ### Tech Stack
 
 Go backend with hexagonal architecture. PostgreSQL for storage, Redis for caching. HTMX + Tailwind CSS frontend.
@@ -192,7 +198,7 @@ EchoArtworks is a web-based social platform built with PHP and MySQL, designed f
 
 This project demonstrates full-stack web development skills, database design, user experience design, and social media platform architecture.
 `,
-		Tags:      []string{"Java", "Spring Boot", "API"},
+		Tags:      []string{"PHP", "MySql"},
 		RepoUrl:   "https://github.com/elghazx/echoartworks",
 		LiveUrl:   "",
 		ImageUrl:  "/static/images/echoartworks.webp",

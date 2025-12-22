@@ -88,8 +88,8 @@ templ ProjectDetailContent(project models.Project) {
 		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ project.Title }</h1>
 	</div>
 	if project.ImageUrl != "" {
-		<div class="mb-8">
-			<img src={ project.ImageUrl } alt={ project.Title } class="w-full h-64 object-cover rounded-lg"/>
+		<div class="mb-8 aspect-video overflow-hidden rounded-lg border border-gray-200 shadow-md">
+			<img src={ project.ImageUrl } alt={ project.Title } class="w-full h-full object-cover"/>
 		</div>
 	}
 	<div class="prose prose-gray max-w-none mb-8">
