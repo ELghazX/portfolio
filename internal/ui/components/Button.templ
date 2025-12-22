@@ -1,5 +1,7 @@
 package components
 
+import "strings"
+
 type ButtonVariant string
 
 const (
@@ -18,9 +20,19 @@ sm:w-auto text-sm`
 		} else {
 			variantClasses = "bg-gray-100 text-gray-900 hover:bg-gray-200"
 		}
+		
+		// Check if it's an external link
+		isExternal := strings.HasPrefix(href, "http://") || strings.HasPrefix(href, "https://")
 	}}
-	if href == "/" {
-		<a href={ templ.SafeURL(href) } class={ baseClasses + " " + variantClasses }>
+	if href == "/" || isExternal {
+		<a 
+			href={ templ.SafeURL(href) } 
+			class={ baseClasses + " " + variantClasses }
+			if isExternal {
+				target="_blank"
+				rel="noopener noreferrer"
+			}
+		>
 			if icon != nil {
 				@icon
 			}
