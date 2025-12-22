@@ -1,20 +1,8 @@
 package components
 
-import "database/sql"
+import "github.com/elghazx/portfolio/internal/models"
 
-type Project struct {
-	ID       int32
-	Title    string
-	Slug     string
-	Summary  string
-	Content  string
-	RepoUrl  *string
-	LiveUrl  *string
-	Tags     []string
-	ImageUrl sql.NullString
-}
-
-templ ProjectCard(project Project) {
+templ ProjectCard(project models.Project) {
 	<a
 		href={ templ.URL("/projects/" + project.Slug) }
 		hx-get={ "/projects/" + project.Slug }
@@ -25,8 +13,8 @@ templ ProjectCard(project Project) {
 	>
 		<div class="relative">
 			<div class="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300">
-				if project.ImageUrl.Valid && project.ImageUrl.String != "" {
-					<img src={ project.ImageUrl.String } alt={ project.Title } class="w-full h-full object-cover"/>
+				if project.ImageUrl != "" {
+					<img src={ project.ImageUrl } alt={ project.Title } class="w-full h-full object-cover"/>
 				}
 			</div>
 		</div>

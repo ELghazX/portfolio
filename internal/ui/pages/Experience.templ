@@ -3,18 +3,10 @@ package pages
 import (
 	"github.com/elghazx/portfolio/internal/ui/components"
 	"github.com/elghazx/portfolio/internal/ui/icons"
+	"github.com/elghazx/portfolio/internal/models"
 )
 
-type ExperienceItem struct {
-	ID          int
-	Type        string
-	Period      string
-	Title       string
-	Institution string
-	Description string
-}
-
-templ Experience(experiences []ExperienceItem) {
+templ Experience(experiences []models.Experience) {
 	@components.Base("experience") {
 		<div class="max-w-4xl mx-auto">
 			<div class="mb-10">
@@ -32,34 +24,92 @@ templ Experience(experiences []ExperienceItem) {
 				</div>
 			</div>
 			<div class="border-t border-gray-200 mb-10"></div>
-			<div class="relative">
-				for i, exp := range experiences {
-					@TimelineItem(exp, i == len(experiences)-1)
-				}
+			<div class="space-y-12">
+				@renderWorkExperiences(experiences)
+				@renderEducationExperiences(experiences)
+				@renderCertificationExperiences(experiences)
 			</div>
 		</div>
 	}
 }
 
-templ TimelineItem(item ExperienceItem, isLast bool) {
-	<div class="relative pb-12">
-		<div class="absolute left-0 top-0 bottom-0 flex flex-col items-center w-10">
-			<div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-lg z-10">
-				@getIcon(item.Type)
+templ renderWorkExperiences(experiences []models.Experience) {
+	if hasType(experiences, "work") {
+		<div class="mb-8">
+			<h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+				@icons.BriefcaseBusiness()
+				Work Experience
+			</h2>
+			<div class="relative">
+				@renderFilteredTimeline(experiences, "work")
 			</div>
+		</div>
+	}
+}
+
+templ renderEducationExperiences(experiences []models.Experience) {
+	if hasType(experiences, "education") {
+		<div class="mb-8">
+			<h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+				@icons.GraduationCap()
+				Education
+			</h2>
+			<div class="relative">
+				@renderFilteredTimeline(experiences, "education")
+			</div>
+		</div>
+	}
+}
+
+templ renderCertificationExperiences(experiences []models.Experience) {
+	if hasType(experiences, "certification") {
+		<div class="mb-8">
+			<h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+				@icons.ScrollText()
+				Certifications
+			</h2>
+			<div class="relative">
+				@renderFilteredTimeline(experiences, "certification")
+			</div>
+		</div>
+	}
+}
+
+templ renderFilteredTimeline(experiences []models.Experience, expType string) {
+	for i, exp := range experiences {
+		if exp.Type == expType {
+			@TimelineItem(exp, isLastOfType(experiences, expType, i))
+		}
+	}
+}
+
+templ TimelineItem(item models.Experience, isLast bool) {
+	<div class="relative pb-8">
+		<div class="absolute left-0 top-0 bottom-0 flex flex-col items-center w-6">
+			<div class="w-3 h-3 bg-gray-400 rounded-full z-10"></div>
 			if !isLast {
 				<div class="flex-1 w-0.5 bg-gray-200 mt-2"></div>
 			}
 		</div>
-		<div class="ml-16">
-			<h3 class="text-base font-bold text-gray-900 mb-4">
-				{ getTitle(item.Type) }
-			</h3>
+		<div class="ml-10">
 			<div class="bg-white rounded-lg border border-gray-200 p-5">
-				<div class="text-xs text-gray-500 mb-3">{ item.Period }</div>
+				<div class="text-xs text-gray-500 mb-3">
+					{ item.StartDate.Format("Jan 2006") }
+					if item.EndDate != nil {
+						- { item.EndDate.Format("Jan 2006") }
+					} else {
+						- Present
+					}
+				</div>
 				<h4 class="text-base font-bold text-gray-900 mb-1">{ item.Title }</h4>
 				if item.Institution != "" {
 					<div class="text-sm text-gray-600 mb-3">{ item.Institution }</div>
+				}
+				if item.Location != "" {
+					<div class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+						@icons.MapPin()
+						{ item.Location }
+					</div>
 				}
 				if item.Description != "" {
 					<p class="text-sm text-gray-700 leading-relaxed">{ item.Description }</p>
@@ -83,14 +133,32 @@ templ getIcon(itemType string) {
 }
 
 func getTitle(itemType string) string {
-	switch itemType {
-	case "work":
-		return "Work History"
-	case "education":
-		return "Education"
-	case "certification":
-		return "Certification"
-	default:
-		return "Item"
+switch itemType {
+case "work":
+return "Work"
+case "education":
+return "Education"
+case "certification":
+return "Certification"
+default:
+return "Item"
+}
+}
+
+func hasType(experiences []models.Experience, expType string) bool {
+for _, exp := range experiences {
+if exp.Type == expType {
+return true
+}
+}
+return false
+}
+
+func isLastOfType(experiences []models.Experience, expType string, currentIndex int) bool {
+	for i := currentIndex + 1; i < len(experiences); i++ {
+		if experiences[i].Type == expType {
+			return false
+		}
 	}
+	return true
 }

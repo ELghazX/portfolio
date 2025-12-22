@@ -1,9 +1,12 @@
 package pages
 
-import "github.com/elghazx/portfolio/internal/ui/components"
-import "github.com/elghazx/portfolio/internal/ui/icons"
+import (
+	"github.com/elghazx/portfolio/internal/ui/components"
+	"github.com/elghazx/portfolio/internal/ui/icons"
+	"github.com/elghazx/portfolio/internal/models"
+)
 
-templ Posts(posts []components.Post) {
+templ Posts(posts []models.Post) {
 	@components.Base("posts") {
 		<div class="mb-8">
 			<div class="text-sm text-gray-500 mb-3">$ ~/posts</div>
@@ -20,7 +23,7 @@ templ Posts(posts []components.Post) {
 	}
 }
 
-templ PostsList(posts []components.Post) {
+templ PostsList(posts []models.Post) {
 	<div class="divide-y divide-gray-200">
 		if len(posts) > 0 {
 			for _, post := range posts {

@@ -1,9 +1,12 @@
 package pages
 
-import "github.com/elghazx/portfolio/internal/ui/components"
-import "github.com/elghazx/portfolio/internal/ui/icons"
+import (
+	"github.com/elghazx/portfolio/internal/ui/components"
+	"github.com/elghazx/portfolio/internal/ui/icons"
+	"github.com/elghazx/portfolio/internal/models"
+)
 
-templ HomeContent(projects []components.Project) {
+templ HomeContent(projects []models.Project) {
 	<div class="text-sm text-gray-500 mb-3">$ ~/</div>
 	@components.Terminal()
 	<section>
@@ -16,7 +19,7 @@ templ HomeContent(projects []components.Project) {
 	</section>
 }
 
-templ ProjectsContent(projects []components.Project) {
+templ ProjectsContent(projects []models.Project) {
 	<div class="mb-8">
 		<div class="text-sm text-gray-500 mb-3">$ ~/projects</div>
 		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Projects</h1>
@@ -28,7 +31,7 @@ templ ProjectsContent(projects []components.Project) {
 	</div>
 }
 
-templ PostsContent(posts []components.Post) {
+templ PostsContent(posts []models.Post) {
 	<div class="mb-8">
 		<div class="text-sm text-gray-500 mb-3">$ ~/posts</div>
 		<h1 class="text-4xl font-bold text-gray-900 mb-3">Posts</h1>
@@ -43,7 +46,7 @@ templ PostsContent(posts []components.Post) {
 	</div>
 }
 
-templ ExperienceContent(experiences []ExperienceItem) {
+templ ExperienceContent(experiences []models.Experience) {
 	<div class="mb-10">
 		<div class="text-sm text-gray-500 mb-3">$ ~/experience</div>
 		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
@@ -59,18 +62,19 @@ templ ExperienceContent(experiences []ExperienceItem) {
 		</div>
 	</div>
 	<div class="border-t border-gray-200 mb-10"></div>
-	<div class="relative">
-		for i, exp := range experiences {
-			@TimelineItem(exp, i == len(experiences)-1)
-		}
+	<div class="space-y-12">
+		@renderWorkExperiences(experiences)
+		@renderEducationExperiences(experiences)
+		@renderCertificationExperiences(experiences)
 	</div>
 }
 
-templ ProjectDetailContent(project components.Project) {
+templ ProjectDetailContent(project models.Project) {
 	<div class="mb-8">
+		<div class="text-sm text-gray-500 mb-3">$ ~/projects/{ project.Slug }</div>
 		<div class="flex items-center gap-4 mb-4">
-			<a 
-				href="/projects" 
+			<a
+				href="/projects"
 				hx-get="/projects"
 				hx-target="#main-content"
 				hx-swap="innerHTML"
@@ -81,41 +85,37 @@ templ ProjectDetailContent(project components.Project) {
 				<span>Back to Projects</span>
 			</a>
 		</div>
-		<div class="text-sm text-gray-500 mb-3">$ ~/projects/{ project.Slug }</div>
 		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ project.Title }</h1>
 	</div>
-	
-	if project.ImageUrl.Valid && project.ImageUrl.String != "" {
+	if project.ImageUrl != "" {
 		<div class="mb-8">
-			<img src={ project.ImageUrl.String } alt={ project.Title } class="w-full h-64 object-cover rounded-lg"/>
+			<img src={ project.ImageUrl } alt={ project.Title } class="w-full h-64 object-cover rounded-lg"/>
 		</div>
 	}
-	
 	<div class="prose prose-gray max-w-none mb-8">
-		{ project.Content }
+		@templ.Raw(components.MarkdownToHTML(project.Content))
 	</div>
-	
 	<div class="flex flex-wrap gap-2 mb-8">
 		for _, tag := range project.Tags {
 			<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-md">{ tag }</span>
 		}
 	</div>
-	
 	<div class="flex gap-4">
-		if project.RepoUrl != nil && *project.RepoUrl != "" {
-			@components.Button(*project.RepoUrl, "View Repository", components.ButtonPrimary, nil)
+		if project.RepoUrl != "" {
+			@components.Button(project.RepoUrl, "View Repository", components.ButtonPrimary, nil)
 		}
-		if project.LiveUrl != nil && *project.LiveUrl != "" {
-			@components.Button(*project.LiveUrl, "Live Demo", components.ButtonSecondary, nil)
+		if project.LiveUrl != "" {
+			@components.Button(project.LiveUrl, "Live Demo", components.ButtonSecondary, nil)
 		}
 	</div>
 }
 
-templ PostDetailContent(post components.Post) {
+templ PostDetailContent(post models.Post) {
+	<div class="text-sm text-gray-500 mb-3">$ ~/posts/{ post.Slug }</div>
 	<div class="mb-8">
 		<div class="flex items-center gap-4 mb-4">
-			<a 
-				href="/posts" 
+			<a
+				href="/posts"
 				hx-get="/posts"
 				hx-target="#main-content"
 				hx-swap="innerHTML"
@@ -126,17 +126,14 @@ templ PostDetailContent(post components.Post) {
 				<span>Back to Posts</span>
 			</a>
 		</div>
-		<div class="text-sm text-gray-500 mb-3">$ ~/posts/{ post.Slug }</div>
 		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ post.Title }</h1>
 		<div class="text-sm text-gray-500 mb-4">
 			{ post.CreatedAt.Format("January 2, 2006") }
 		</div>
 	</div>
-	
 	<div class="prose prose-gray max-w-none mb-8">
-		{ post.Content }
+		@templ.Raw(components.MarkdownToHTML(post.Content))
 	</div>
-	
 	<div class="flex flex-wrap gap-2">
 		for _, tag := range post.Tags {
 			<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-md">#{ tag }</span>

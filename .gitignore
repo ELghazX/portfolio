@@ -24,6 +24,7 @@ go.work.sum
 # IDE specific files
 .vscode
 .idea
+blog.md
 
 # Project build
 bin
@@ -32,4 +33,4 @@ tmp
 node_modules
 internal/static/css/tailwind.css
 *_templ.go
-static/assets/images/*
+# static/assets/images/*

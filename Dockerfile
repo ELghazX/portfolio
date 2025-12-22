@@ -1,28 +1,36 @@
-FROM golang:1.25.5 AS builder
+# Frontend
+FROM oven/bun:alpine AS frontend-builder
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install
+COPY . .
+RUN bun x tailwindcss -i static/assets/css/app.css -o static/assets/dist/tailwind.css --minify
 
+# Go Builder
+FROM golang:1.23-alpine AS go-builder
 WORKDIR /app
 
-# Needs to install npm to be able to install the tailwind modules
-RUN apt-get update && apt-get install -y npm
+RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN wget -qO- https://github.com/sqlc-dev/sqlc/releases/download/v1.27.0/sqlc_1.27.0_linux_amd64.tar.gz | tar -xz -C /usr/local/bin
 
 COPY go.mod go.sum ./
-
-# Downloads Go packages
 RUN go mod download
-
-# Copies project's files to container
 COPY . .
-# Does a clean install of the tailwind modules
-RUN npm ci
-# Builds the single binary for a linux and amd64 architecture
-RUN make build
 
+RUN sqlc generate
+RUN templ generate
+
+COPY --from=frontend-builder /app/static/assets/dist/tailwind.css ./static/assets/dist/tailwind.css
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/main ./cmd/api/main.go
+
+# Runner 
 FROM alpine:latest
-WORKDIR /root/
+RUN apk add --no-cache ca-certificates tzdata
+WORKDIR /app
 
-# Copies binary from previous container
-COPY --from=builder /app/bin/main .
+COPY --from=go-builder /app/main .
+COPY --from=go-builder /app/static ./static
 
 EXPOSE 8080
-
 CMD ["./main"]

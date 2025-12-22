@@ -1,6 +1,8 @@
 package components
 
-templ ProjectsList(projects []Project) {
+import "github.com/elghazx/portfolio/internal/models"
+
+templ ProjectsList(projects []models.Project) {
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 		for _, project := range projects {
 			@ProjectCard(project)

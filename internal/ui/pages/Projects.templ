@@ -1,8 +1,11 @@
 package pages
 
-import "github.com/elghazx/portfolio/internal/ui/components"
+import (
+	"github.com/elghazx/portfolio/internal/ui/components"
+	"github.com/elghazx/portfolio/internal/models"
+)
 
-templ Projects(projects []components.Project) {
+templ Projects(projects []models.Project) {
 	@components.Base("projects") {
 		<div class="max-w-4xl mx-auto">
 			<div class="mb-8">
@@ -18,7 +21,7 @@ templ Projects(projects []components.Project) {
 	}
 }
 
-templ ProjectsList(projects []components.Project) {
+templ ProjectsList(projects []models.Project) {
 	if len(projects) > 0 {
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 			for _, project := range projects {

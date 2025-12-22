@@ -1,18 +1,8 @@
 package components
 
-import "time"
+import "github.com/elghazx/portfolio/internal/models"
 
-type Post struct {
-	ID        int32
-	Title     string
-	Slug      string
-	Summary   string
-	Content   string
-	Tags      []string
-	CreatedAt time.Time
-}
-
-templ PostCard(post Post) {
+templ PostCard(post models.Post) {
 	<div class="border-b border-gray-200 py-6 hover:bg-gray-50 transition-colors">
 		<div class="flex flex-col sm:flex-row gap-4">
 			<div class="text-sm text-gray-500 sm:w-28 flex-shrink-0">
