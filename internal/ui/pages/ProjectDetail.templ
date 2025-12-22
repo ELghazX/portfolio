@@ -1,0 +1,46 @@
+package pages
+
+import "github.com/elghazx/portfolio/internal/ui/components"
+import "github.com/elghazx/portfolio/internal/ui/icons"
+
+templ ProjectDetail(project components.Project) {
+	@components.Base("project") {
+		<div class="max-w-4xl mx-auto">
+			<div class="mb-8">
+				<div class="flex items-center gap-4 mb-4">
+					<a href="/projects" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+						@icons.ArrowLeft()
+						<span>Back to Projects</span>
+					</a>
+				</div>
+				<div class="text-sm text-gray-500 mb-3">$ ~/projects/{ project.Slug }</div>
+				<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ project.Title }</h1>
+			</div>
+			
+			if project.ImageUrl.Valid && project.ImageUrl.String != "" {
+				<div class="mb-8">
+					<img src={ project.ImageUrl.String } alt={ project.Title } class="w-full h-64 object-cover rounded-lg"/>
+				</div>
+			}
+			
+			<div class="prose prose-gray max-w-none mb-8">
+				{ project.Content }
+			</div>
+			
+			<div class="flex flex-wrap gap-2 mb-8">
+				for _, tag := range project.Tags {
+					<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-md">{ tag }</span>
+				}
+			</div>
+			
+			<div class="flex gap-4">
+				if project.RepoUrl != nil && *project.RepoUrl != "" {
+					@components.Button(*project.RepoUrl, "View Repository", components.ButtonPrimary, nil)
+				}
+				if project.LiveUrl != nil && *project.LiveUrl != "" {
+					@components.Button(*project.LiveUrl, "Live Demo", components.ButtonSecondary, nil)
+				}
+			</div>
+		</div>
+	}
+}

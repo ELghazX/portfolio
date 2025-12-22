@@ -7,16 +7,162 @@ package gen
 
 import (
 	"context"
+
+	"github.com/lib/pq"
 )
 
-const getExample = `-- name: GetExample :one
-SELECT 1 as example
+const getAllExperiences = `-- name: GetAllExperiences :many
+SELECT id, type, title, institution, location, start_date, end_date, description, created_at FROM experiences ORDER BY start_date DESC
 `
 
-// Example query (can be removed when real queries are added)
-func (q *Queries) GetExample(ctx context.Context) (int32, error) {
-	row := q.db.QueryRowContext(ctx, getExample)
-	var example int32
-	err := row.Scan(&example)
-	return example, err
+// Experiences queries
+func (q *Queries) GetAllExperiences(ctx context.Context) ([]Experience, error) {
+	rows, err := q.db.QueryContext(ctx, getAllExperiences)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Experience
+	for rows.Next() {
+		var i Experience
+		if err := rows.Scan(
+			&i.ID,
+			&i.Type,
+			&i.Title,
+			&i.Institution,
+			&i.Location,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Description,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllPosts = `-- name: GetAllPosts :many
+SELECT id, title, slug, summary, content, tags, created_at FROM posts ORDER BY created_at DESC
+`
+
+// Posts queries
+func (q *Queries) GetAllPosts(ctx context.Context) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPosts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Summary,
+			&i.Content,
+			pq.Array(&i.Tags),
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllProjects = `-- name: GetAllProjects :many
+SELECT id, title, slug, summary, content, repo_url, live_url, tags, image_url, status, created_at FROM projects WHERE status = 'published' ORDER BY created_at DESC
+`
+
+// Projects queries
+func (q *Queries) GetAllProjects(ctx context.Context) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getAllProjects)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Summary,
+			&i.Content,
+			&i.RepoUrl,
+			&i.LiveUrl,
+			pq.Array(&i.Tags),
+			&i.ImageUrl,
+			&i.Status,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPostBySlug = `-- name: GetPostBySlug :one
+SELECT id, title, slug, summary, content, tags, created_at FROM posts WHERE slug = $1
+`
+
+func (q *Queries) GetPostBySlug(ctx context.Context, slug string) (Post, error) {
+	row := q.db.QueryRowContext(ctx, getPostBySlug, slug)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Summary,
+		&i.Content,
+		pq.Array(&i.Tags),
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getProjectBySlug = `-- name: GetProjectBySlug :one
+SELECT id, title, slug, summary, content, repo_url, live_url, tags, image_url, status, created_at FROM projects WHERE slug = $1 AND status = 'published'
+`
+
+func (q *Queries) GetProjectBySlug(ctx context.Context, slug string) (Project, error) {
+	row := q.db.QueryRowContext(ctx, getProjectBySlug, slug)
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Summary,
+		&i.Content,
+		&i.RepoUrl,
+		&i.LiveUrl,
+		pq.Array(&i.Tags),
+		&i.ImageUrl,
+		&i.Status,
+		&i.CreatedAt,
+	)
+	return i, err
 }

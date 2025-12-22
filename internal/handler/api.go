@@ -12,6 +12,7 @@ func NewServer(staticFiles embed.FS) *echo.Echo {
 
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
+	e.Use(ActivePageMiddleware())
 
 	h := NewHandler(staticFiles)
 	RegisterRoutes(e, h)

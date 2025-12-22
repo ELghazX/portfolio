@@ -19,10 +19,26 @@ sm:w-auto text-sm`
 			variantClasses = "bg-gray-100 text-gray-900 hover:bg-gray-200"
 		}
 	}}
-	<a href={ templ.SafeURL(href) } class={ baseClasses + " " + variantClasses }>
-		if icon != nil {
-			@icon
-		}
-		<span>{ text }</span>
-	</a>
+	if href == "/" {
+		<a href={ templ.SafeURL(href) } class={ baseClasses + " " + variantClasses }>
+			if icon != nil {
+				@icon
+			}
+			<span>{ text }</span>
+		</a>
+	} else {
+		<a 
+			href={ templ.SafeURL(href) } 
+			hx-get={ href }
+			hx-target="#main-content"
+			hx-swap="innerHTML"
+			hx-push-url="true"
+			class={ baseClasses + " " + variantClasses }
+		>
+			if icon != nil {
+				@icon
+			}
+			<span>{ text }</span>
+		</a>
+	}
 }

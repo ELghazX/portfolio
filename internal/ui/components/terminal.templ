@@ -120,7 +120,22 @@ templ Terminal() {
         if (validDirs.includes(dir)) {
           const path = dir === 'home' ? '' : dir;
           this.output.push({text: `Navigating to /${path}...`, type: 'success'});
-          setTimeout(() => window.location.href = `/${path}`, 500);
+          
+          if (dir === 'home') {
+            setTimeout(() => window.location.href = `/${path}`, 500);
+          } else {
+            setTimeout(() => {
+              htmx.ajax('GET', `/${path}`, {
+                target: '#main-content',
+                swap: 'innerHTML',
+                pushUrl: true
+              }).then(() => {
+                if (window.updateActiveMenu) {
+                  window.updateActiveMenu();
+                }
+              });
+            }, 500);
+          }
         } else {
           this.output.push({text: `cd: ${dir}: No such directory`, type: 'error'});
         }

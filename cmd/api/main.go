@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	// connect to database here if needed (opsional)
+	// Database connection disabled for now - using dummy data
 	// database.Init(os.Getenv("DATABASE_URL"))
 
 	port := Getenv(os.Getenv("APP_PORT"), "8080")
