@@ -7,7 +7,7 @@ COPY . .
 RUN bun x tailwindcss -i static/assets/css/app.css -o static/assets/dist/tailwind.css --minify
 
 # Go Builder
-FROM golang:1.23-alpine AS go-builder
+FROM golang:1.25-alpine AS go-builder
 WORKDIR /app
 
 RUN go install github.com/a-h/templ/cmd/templ@latest
