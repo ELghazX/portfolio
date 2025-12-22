@@ -4,11 +4,11 @@ package database
 import (
 	"database/sql"
 
-	"github.com/elghazx/portfolio/internal/database/generated"
+	"github.com/elghazx/portfolio/internal/database/gen"
 	// _ "github.com/lib/pq"
 )
 
-var Queries *generated.Queries
+var Queries *gen.Queries
 
 func Init(dsn string) error {
 	db, err := sql.Open("postgres", dsn)
@@ -16,6 +16,6 @@ func Init(dsn string) error {
 		return err
 	}
 
-	Queries = generated.New(db)
+	Queries = gen.New(db)
 	return nil
 }

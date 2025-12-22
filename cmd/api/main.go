@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	// "github.com/elghazx/goth-echo-setup/internal/database"
-	"github.com/elghazx/portfolio/internal/server"
+	"github.com/elghazx/portfolio/internal/handler"
+	"github.com/elghazx/portfolio/static/assets"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -16,7 +16,7 @@ func main() {
 
 	port := Getenv(os.Getenv("APP_PORT"), "8080")
 
-	e := server.NewServer()
+	e := handler.NewServer(assets.Files)
 	log.Printf("Running server on :%s", port)
 	log.Fatal(e.Start(":" + port))
 }

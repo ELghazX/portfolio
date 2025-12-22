@@ -3,11 +3,11 @@
 -include .env
 
 build-local:
-	@go build -o ./bin/main cmd/main/main.go
+	@go build -o ./bin/main cmd/api/main.go
 
 build:
 	@npm run build
-	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/main cmd/main/main.go
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/main cmd/api/main.go
 
 templ:
 	@templ generate --watch --proxy=http://localhost:$(APP_PORT) --proxyport=$(TEMPL_PROXY_PORT) --open-browser=false --proxybind="0.0.0.0"

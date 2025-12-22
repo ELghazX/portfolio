@@ -1,15 +1,29 @@
-package server
+package handler
 
 import (
+	"embed"
 	"strings"
 	"time"
 
-	"github.com/elghazx/portfolio/internal/components"
-	"github.com/elghazx/portfolio/internal/components/pages"
+	"github.com/elghazx/portfolio/internal/ui/components"
+	"github.com/elghazx/portfolio/internal/ui/pages"
 	"github.com/labstack/echo/v4"
 )
 
-func homeHandler(c echo.Context) error {
+type Handler struct {
+	StaticFiles embed.FS
+	// Add database/queries dependency here when needed
+	// db *database.Queries
+}
+
+func NewHandler(staticFiles embed.FS) *Handler {
+	return &Handler{
+		StaticFiles: staticFiles,
+		// Initialize dependencies here
+	}
+}
+
+func (h *Handler) homeHandler(c echo.Context) error {
 	projects := []components.Project{
 		{
 			ID:          1,
@@ -34,7 +48,7 @@ func homeHandler(c echo.Context) error {
 	return Render(c, pages.Home(projects))
 }
 
-func projectsHandler(c echo.Context) error {
+func (h *Handler) projectsHandler(c echo.Context) error {
 	projects := []components.Project{
 		{
 			ID:          1,
@@ -93,7 +107,7 @@ func projectsHandler(c echo.Context) error {
 	return Render(c, pages.Projects(filteredProjects))
 }
 
-func experienceHandler(c echo.Context) error {
+func (h *Handler) experienceHandler(c echo.Context) error {
 	experiences := []pages.ExperienceItem{
 		{
 			ID:          1,
@@ -124,11 +138,11 @@ func experienceHandler(c echo.Context) error {
 	return Render(c, pages.Experience(experiences))
 }
 
-func notFoundHandler(c echo.Context) error {
+func (h *Handler) notFoundHandler(c echo.Context) error {
 	return Render(c, pages.NotFound())
 }
 
-func postsHandler(c echo.Context) error {
+func (h *Handler) postsHandler(c echo.Context) error {
 	allPosts := []components.Post{
 		{
 			ID:        1,
