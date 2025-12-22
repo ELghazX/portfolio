@@ -1,12 +1,8 @@
 package components
 
-import (
-	"fmt"
-	"github.com/elghazx/portfolio/internal/ui/icons"
-)
+import "github.com/elghazx/portfolio/internal/ui/icons"
 
-templ SearchBar(endpoint string) {
-	{{ placeholder := fmt.Sprintf("Search %s...", endpoint) }}
+templ SearchContainer(endpoint string, children templ.Component) {
 	<div class="mb-6">
 		<div class="relative">
 			@icons.Search(templ.Attributes{
@@ -14,16 +10,26 @@ templ SearchBar(endpoint string) {
 			})
 			<input
 				type="text"
-				placeholder={ placeholder }
+				placeholder={ "Search " + endpoint + "..." }
 				class="w-full pl-11 pr-4 py-3 bg-gray-100 border-none rounded-lg text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
 				hx-get={ "/" + endpoint }
 				hx-trigger="keyup changed delay:300ms, search"
-				hx-target={ "#" + endpoint + "-container" }
-				hx-swap="innerHTML"
+				hx-target={ "#" + endpoint + "-results" }
+				hx-swap="outerHTML"
 				hx-include="this"
-				hx-headers='{"HX-Trigger": "search-form"}'
 				name="search"
+				x-data
+				@keyup="if ($event.target.value === '') { htmx.trigger($event.target, 'search') }"
 			/>
 		</div>
+	</div>
+	<div id={ endpoint + "-results" } hx-preserve>
+		@children
+	</div>
+}
+
+templ SearchResults(endpoint string, children templ.Component) {
+	<div id={ endpoint + "-results" }>
+		@children
 	</div>
 }

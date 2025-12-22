@@ -1,0 +1,16 @@
+package components
+
+templ PageHeader(path, title, description string) {
+	<div class="mb-8">
+		<div class="text-sm text-gray-500 mb-3">$ ~/{ path }</div>
+		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ title }</h1>
+		if description != "" {
+			<p class="text-gray-600 text-lg">{ description }</p>
+		}
+	</div>
+}
+
+templ PageHeaderWithBorder(path, title, description string) {
+	@PageHeader(path, title, description)
+	<div class="border-t border-gray-200 mb-6"></div>
+}

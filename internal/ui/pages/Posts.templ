@@ -8,19 +8,13 @@ import (
 
 templ Posts(posts []models.Post) {
 	@components.Base("posts") {
-		<div class="mb-8">
-			<div class="text-sm text-gray-500 mb-3">$ ~/posts</div>
-			<h1 class="text-4xl font-bold text-gray-900 mb-3">Posts</h1>
-			<p class="text-gray-600 text-base leading-relaxed">
-				A curated stream of technical tutorials, insights, and project logs.
-			</p>
-		</div>
-		<div class="border-t border-gray-200 mb-6"></div>
-		@components.SearchBar("posts")
-		<div id="posts-container">
-			@PostsList(posts)
-		</div>
+		@PostsContent(posts)
 	}
+}
+
+templ PostsContent(posts []models.Post) {
+	@components.PageHeaderWithBorder("posts", "Posts", "A curated stream of technical tutorials, insights, and project logs.")
+	@components.SearchContainer("posts", components.SearchResults("posts", PostsList(posts)))
 }
 
 templ PostsList(posts []models.Post) {

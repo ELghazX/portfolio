@@ -20,6 +20,21 @@ templ Base(activeMenu string) {
 			<script src="/static/htmx.min.js"></script>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 			<script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('app', {
+        loading: false,
+        currentPage: window.location.pathname,
+        
+        setLoading(state) {
+          this.loading = state;
+        },
+        
+        setCurrentPage(path) {
+          this.currentPage = path;
+        }
+      });
+    });
+
     function updateActiveMenu() {
       const path = window.location.pathname;
       document.querySelectorAll('nav a').forEach(link => {
@@ -44,12 +59,23 @@ templ Base(activeMenu string) {
       }
     }
 
-    document.addEventListener('htmx:afterRequest', updateActiveMenu);
+    document.addEventListener('htmx:beforeRequest', function(evt) {
+      Alpine.store('app').setLoading(true);
+    });
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+      Alpine.store('app').setLoading(false);
+      updateActiveMenu();
+    });
 
     document.addEventListener('htmx:load', function (evt) {
       if (window.Alpine) {
         window.Alpine.initTree(evt.detail.elt);
       }
+    });
+
+    document.addEventListener('htmx:pushedIntoHistory', function(evt) {
+      Alpine.store('app').setCurrentPage(evt.detail.path);
     });
 
     window.updateActiveMenu = updateActiveMenu;

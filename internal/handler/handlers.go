@@ -3,45 +3,44 @@ package handler
 import (
 	"embed"
 	"net/http"
-	"strings"
 
-	"github.com/elghazx/portfolio/internal/models"
+	"github.com/elghazx/portfolio/internal/ui/components"
 	"github.com/elghazx/portfolio/internal/ui/pages"
 	"github.com/labstack/echo/v4"
 )
 
 type Handler struct {
 	StaticFiles embed.FS
+	htmx        *HTMXHelper
 }
 
 func NewHandler(staticFiles embed.FS) *Handler {
 	return &Handler{
 		StaticFiles: staticFiles,
+		htmx:        NewHTMXHelper(),
 	}
 }
 
 func (h *Handler) homeHandler(c echo.Context) error {
-	if c.Request().Header.Get("HX-Request") == "true" {
-		return Render(c, pages.HomeContent(Projects[:3]))
+	projects := Projects[:3]
+	
+	if h.htmx.IsHTMXRequest(c) {
+		return Render(c, pages.HomeContent(projects))
 	}
-	return Render(c, pages.Home(Projects[:3]))
+	return Render(c, pages.Home(projects))
 }
 
 func (h *Handler) projectsHandler(c echo.Context) error {
-	search := strings.ToLower(c.QueryParam("search"))
-	var filteredProjects []models.Project
+	searchTerm := h.htmx.GetSearchTerm(c)
+	filteredProjects := h.htmx.FilterProjects(Projects, searchTerm)
 
-	for _, project := range Projects {
-		if search == "" || strings.Contains(strings.ToLower(project.Title), search) || strings.Contains(strings.ToLower(project.Summary), search) {
-			filteredProjects = append(filteredProjects, project)
+	if h.htmx.IsHTMXRequest(c) {
+		h.htmx.SetNoCache(c)
+		
+		if searchTerm != "" {
+			return Render(c, components.SearchResults("projects", pages.ProjectsList(filteredProjects)))
 		}
-	}
-
-	// For HTMX requests
-	if c.Request().Header.Get("HX-Request") == "true" {
-		if c.Request().Header.Get("HX-Trigger") == "search-form" {
-			return Render(c, pages.ProjectsList(filteredProjects))
-		}
+		
 		return Render(c, pages.ProjectsContent(filteredProjects))
 	}
 
@@ -53,7 +52,7 @@ func (h *Handler) projectDetailHandler(c echo.Context) error {
 
 	for _, project := range Projects {
 		if project.Slug == slug {
-			if c.Request().Header.Get("HX-Request") == "true" {
+			if h.htmx.IsHTMXRequest(c) {
 				return Render(c, pages.ProjectDetailContent(project))
 			}
 			return Render(c, pages.ProjectDetail(project))
@@ -64,20 +63,16 @@ func (h *Handler) projectDetailHandler(c echo.Context) error {
 }
 
 func (h *Handler) postsHandler(c echo.Context) error {
-	search := strings.ToLower(c.QueryParam("search"))
-	var filteredPosts []models.Post
+	searchTerm := h.htmx.GetSearchTerm(c)
+	filteredPosts := h.htmx.FilterPosts(Posts, searchTerm)
 
-	for _, post := range Posts {
-		if search == "" || strings.Contains(strings.ToLower(post.Title), search) || strings.Contains(strings.ToLower(post.Summary), search) {
-			filteredPosts = append(filteredPosts, post)
+	if h.htmx.IsHTMXRequest(c) {
+		h.htmx.SetNoCache(c)
+		
+		if searchTerm != "" {
+			return Render(c, components.SearchResults("posts", pages.PostsList(filteredPosts)))
 		}
-	}
-
-	// For HTMX requests
-	if c.Request().Header.Get("HX-Request") == "true" {
-		if c.Request().Header.Get("HX-Trigger") == "search-form" {
-			return Render(c, pages.PostsList(filteredPosts))
-		}
+		
 		return Render(c, pages.PostsContent(filteredPosts))
 	}
 
@@ -89,7 +84,7 @@ func (h *Handler) postDetailHandler(c echo.Context) error {
 
 	for _, post := range Posts {
 		if post.Slug == slug {
-			if c.Request().Header.Get("HX-Request") == "true" {
+			if h.htmx.IsHTMXRequest(c) {
 				return Render(c, pages.PostDetailContent(post))
 			}
 			return Render(c, pages.PostDetail(post))
@@ -100,7 +95,7 @@ func (h *Handler) postDetailHandler(c echo.Context) error {
 }
 
 func (h *Handler) experienceHandler(c echo.Context) error {
-	if c.Request().Header.Get("HX-Request") == "true" {
+	if h.htmx.IsHTMXRequest(c) {
 		return Render(c, pages.ExperienceContent(Experiences))
 	}
 	return Render(c, pages.Experience(Experiences))

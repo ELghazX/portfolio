@@ -3,20 +3,27 @@ package components
 templ Terminal() {
 	<section class="mb-8 sm:mb-12" x-data="terminalLogic()">
 		<div class="flex items-center justify-between mb-4 sm:mb-6">
-			<h2 class="text-2xl sm:text-3xl font-bold text-gray-900">TERMINAL ACCESS</h2>
+			<h2 class="text-2xl sm:text-3xl font-bold text-gray-900">INTERACTIVE TERMINAL</h2>
 		</div>
-		<div class="bg-gray-900 rounded-lg overflow-hidden shadow-lg">
+		<div
+			class="bg-gray-900 rounded-lg overflow-hidden shadow-lg cursor-text hover:shadow-xl transition-shadow duration-200 border-2 border-transparent hover:border-green-500/30"
+			@click="focusInput()"
+		>
 			<div class="bg-gray-800 px-4 py-2 flex items-center gap-2">
 				<div class="flex gap-2">
 					<div class="w-3 h-3 bg-red-500 rounded-full"></div>
 					<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
 					<div class="w-3 h-3 bg-green-500 rounded-full"></div>
 				</div>
-				<span class="text-gray-400 text-xs ml-2">elghaz.my.id</span>
+				<!-- <span class="text-gray-400 text-xs ml-2">elghaz.my.id</span> -->
+				<div class="ml-auto flex items-center gap-2 text-xs text-gray-500">
+					<span>Type 'help' for commands</span>
+				</div>
 			</div>
 			<div
 				class="p-4 sm:p-6 font-mono text-xs sm:text-sm min-h-[250px] max-h-[400px] overflow-y-auto"
 				x-ref="terminalBody"
+				@click="focusInput()"
 			>
 				<template x-for="line in output">
 					<div
@@ -30,7 +37,7 @@ templ Terminal() {
 						x-text="line.text"
 					></div>
 				</template>
-				<div class="flex items-center mt-2">
+				<div class="flex items-center mt-2" @click="focusInput()">
 					<span class="text-cyan-400 mr-2">~ ❯</span>
 					<input
 						x-model="currentInput"
@@ -38,10 +45,13 @@ templ Terminal() {
 						@keyup.up="historyUp()"
 						@keyup.down="historyDown()"
 						type="text"
-						class="flex-1 bg-transparent text-white outline-none"
+						class="flex-1 bg-transparent text-white outline-none caret-green-400"
+						x-ref="terminalInput"
 						autofocus
 						autocomplete="off"
+						placeholder="Type a command..."
 					/>
+					<span class="text-gray-600 text-xs ml-2 opacity-50">Press Enter</span>
 				</div>
 			</div>
 		</div>
@@ -54,12 +64,12 @@ templ Terminal() {
       historyIndex: -1,
       output: [
         {text: 'System check... OK', type: 'success'},
-        {text: "Welcome to Ghazali's Portfolio.", type: 'default'},
+        {text: "Welcome to Ghazali's Portfolio Terminal.", type: 'default'},
         {text: "~ ❯ whoami", type: 'prompt'},
         {text: "Informatics student & Backend Developer specializing in Go.", type: 'default'},
         {text: "Experienced in Linux and Proxmox homelab environments.", type: 'default'},
         {text: "Passionate about scalable infrastructure.", type: 'default'},
-        {text: "Try 'help' for available commands", type: 'info'}
+        {text: "💡 Try 'help' for available commands or 'cd projects' to navigate", type: 'info'}
       ],
 
       commands: {
@@ -69,11 +79,11 @@ templ Terminal() {
           {text: 'ls        - List directories', type: 'default'},
           {text: 'whoami    - About me', type: 'default'},
           {text: 'contact   - Contact info', type: 'default'},
-          {text: 'cd        - Change directory', type: 'default'}
+          {text: 'cd <dir>  - Navigate to directory (projects, posts, experience)', type: 'default'}
         ],
         ls: () => [{text: 'home/  experience/  projects/  posts/', type: 'info'}],
         whoami: () => [
-          {text: "I’m Ghazali, Informatics student with a strong interest in backend development using Go (Golang).", type: 'default'},
+          {text: "I'm Ghazali, Informatics student with a strong interest in backend development using Go (Golang).", type: 'default'},
           {text: "Experienced in Linux Environment, running a personal homelab with Proxmox, and building lighweight web applications using Go.", type: 'default'},
           {text: "Passionate about backend systems, infrastructure, and continuous learning.", type: 'default'}
         ],
@@ -82,6 +92,10 @@ templ Terminal() {
           {text: "GitHub: github.com/elghazx", type: 'default'}
         ],
         clear: function () {this.output = []; return null;}
+      },
+
+      focusInput() {
+        this.$refs.terminalInput.focus();
       },
 
       executeCommand() {
@@ -104,7 +118,7 @@ templ Terminal() {
           this.handleCd(arg);
         }
         else {
-          this.output.push({text: `Command not found: ${cmd}`, type: 'error'});
+          this.output.push({text: `Command not found: ${cmd}. Try 'help' for available commands.`, type: 'error'});
         }
 
         this.currentInput = '';
@@ -114,13 +128,13 @@ templ Terminal() {
       handleCd(dir) {
         const validDirs = ['home', 'projects', 'experience', 'posts'];
         if (!dir) {
-          this.output.push({text: `cd: missing operand`, type: 'error'});
+          this.output.push({text: `cd: missing operand. Usage: cd <directory>`, type: 'error'});
           return;
         }
         if (validDirs.includes(dir)) {
           const path = dir === 'home' ? '' : dir;
           this.output.push({text: `Navigating to /${path}...`, type: 'success'});
-          
+
           if (dir === 'home') {
             setTimeout(() => window.location.href = `/${path}`, 500);
           } else {
@@ -137,7 +151,7 @@ templ Terminal() {
             }, 500);
           }
         } else {
-          this.output.push({text: `cd: ${dir}: No such directory`, type: 'error'});
+          this.output.push({text: `cd: ${dir}: No such directory. Available: ${validDirs.join(', ')}`, type: 'error'});
         }
       },
 

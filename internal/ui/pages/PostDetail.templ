@@ -8,28 +8,37 @@ import (
 
 templ PostDetail(post models.Post) {
 	@components.Base("post") {
-		<div class="max-w-4xl mx-auto">
-			<div class="text-sm text-gray-500 mb-3">$ ~/posts/{ post.Slug }</div>
-			<div class="mb-8">
-				<div class="flex items-center gap-4 mb-4">
-					<a href="/posts" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-						@icons.ArrowLeft()
-						<span>Back to Posts</span>
-					</a>
-				</div>
-				<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ post.Title }</h1>
-				<div class="text-sm text-gray-500 mb-4">
-					{ post.CreatedAt.Format("January 2, 2006") }
-				</div>
-			</div>
-			<div class="prose prose-gray max-w-none mb-8">
-				@templ.Raw(components.MarkdownToHTML(post.Content))
-			</div>
-			<div class="flex flex-wrap gap-2">
-				for _, tag := range post.Tags {
-					<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-md">#{ tag }</span>
-				}
-			</div>
-		</div>
+		@PostDetailContent(post)
 	}
+}
+
+templ PostDetailContent(post models.Post) {
+	<div class="text-sm text-gray-500 mb-3">$ ~/posts/{ post.Slug }</div>
+	<div class="mb-8">
+		<div class="flex items-center gap-4 mb-4">
+			<a
+				href="/posts"
+				hx-get="/posts"
+				hx-target="#main-content"
+				hx-swap="innerHTML"
+				hx-push-url="true"
+				class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+			>
+				@icons.ArrowLeft()
+				<span>Back to Posts</span>
+			</a>
+		</div>
+		<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{ post.Title }</h1>
+		<div class="text-sm text-gray-500 mb-4">
+			{ post.CreatedAt.Format("January 2, 2006") }
+		</div>
+	</div>
+	<div class="prose prose-gray max-w-none mb-8">
+		@templ.Raw(components.MarkdownToHTML(post.Content))
+	</div>
+	<div class="flex flex-wrap gap-2">
+		for _, tag := range post.Tags {
+			<span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-md">#{ tag }</span>
+		}
+	</div>
 }
